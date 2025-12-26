@@ -1,7 +1,9 @@
 package com.sein.workshop.util;
 
 import com.sein.workshop.entity.User;
+import com.sein.workshop.repository.RolePermissionRepository;
 import com.sein.workshop.repository.UserRepository;
+import com.sein.workshop.repository.UserRoleRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,9 +16,13 @@ import java.util.List;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final RolePermissionRepository rolePermissionRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepository userRepository, UserRoleRepository userRoleRepository, RolePermissionRepository rolePermissionRepository) {
         this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.rolePermissionRepository = rolePermissionRepository;
     }
 
     @Override
@@ -25,10 +31,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found"));
+                        new UsernameNotFoundException("Invalid credential"));
 
-        List<String> roles = List.of("admin", "user", "superadmin");
-        List<String> perms = List.of("user_read", "user_approve");
+        List<String> roles = userRoleRepository.findRoleCodesByUserId(user.getId());
+        List<String> perms = rolePermissionRepository.findPermissionCodesByUserId(user.getId());
 
         return new CustomUserDetails(
                 user.getId(),

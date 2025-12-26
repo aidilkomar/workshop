@@ -40,8 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 Collection<? extends GrantedAuthority> authorities = jwtUtils.getAuthorities(jwt);
                 Collection<? extends GrantedAuthority> roles = jwtUtils.getRoles(jwt);
-//                UserDetails userDetails =
-//                        userDetailsService.loadUserByUsername(username);
 
                 var userDetails = new UserDetailsDto(username, uuid, roles, authorities);
 

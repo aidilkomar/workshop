@@ -10,16 +10,12 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "uuid"),
-                @UniqueConstraint(columnNames = "username"),
-                @UniqueConstraint(columnNames = "email")
-        }
+        name = "roles",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"uuid", "code", "name"})
 )
-@Getter @Setter
-public class User {
-
+@Getter
+@Setter
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,14 +23,11 @@ public class User {
     @Column(nullable = false, unique = true, updatable = false)
     private UUID uuid;
 
-    @Column(length = 50, nullable = false, unique = true)
-    private String username;
+    @Column(nullable = false, unique = true, length = 50)
+    private String code;
 
-    @Column(length = 255, nullable = false)
-    private String password;
-
-    @Column(length = 255, unique = true)
-    private String email;
+    @Column(nullable = false, length = 100)
+    private String name;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
