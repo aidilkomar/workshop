@@ -1,0 +1,22 @@
+package com.sein.workshop.repository;
+
+import com.sein.workshop.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
+//    @Query("""
+//            select 1 from users where username = :username and deleted_at is null
+//            """)
+    Optional<User> findByUsername(String username);
+
+//    @Query("""
+//            select 1 from users where email = :email and deleted_at is null
+//            """)
+    Optional<User> findByEmail(String email);
+}
