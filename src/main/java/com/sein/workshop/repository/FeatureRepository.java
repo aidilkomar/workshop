@@ -1,6 +1,7 @@
 package com.sein.workshop.repository;
 
 import com.sein.workshop.entity.Feature;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,6 @@ public interface FeatureRepository extends JpaRepository<Feature, Long> {
         order by f.sortOrder
     """)
     List<Feature> findFeaturesByUserId(Long userId);
+
+    boolean existsByCode(@NotBlank(message = "code is required") String code);
 }

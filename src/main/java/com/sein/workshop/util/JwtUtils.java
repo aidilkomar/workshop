@@ -33,15 +33,16 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username, UUID uuid, Collection<? extends GrantedAuthority> roles, Collection<? extends GrantedAuthority> authorities) {
+    public String generateToken(String username, Long id, UUID uuid, Collection<? extends GrantedAuthority> authorities) {
         return Jwts.builder()
                 .subject(username)
+                .claim("id", id.toString())
                 .claim("uid", uuid.toString())
-                .claim("roles", roles.stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList()
-                )
-                .claim("perms", authorities.stream()
+//                .claim("roles", roles.stream()
+//                        .map(GrantedAuthority::getAuthority)
+//                        .toList()
+//                )
+                .claim("roles", authorities.stream()
                         .map(GrantedAuthority::getAuthority)
                         .toList()
                 )
@@ -72,6 +73,17 @@ public class JwtUtils {
                 .getSubject();
     }
 
+    public Long getId(String token) {
+        String id = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("id", String.class);
+
+        return Long.parseLong(id);
+    }
+
     public UUID getUserUuid(String token) {
         String uid = Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -91,6 +103,7 @@ public class JwtUtils {
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("roles", List.class);
+
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();

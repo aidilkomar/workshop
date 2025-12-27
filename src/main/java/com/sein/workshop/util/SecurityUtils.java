@@ -1,5 +1,6 @@
 package com.sein.workshop.util;
 
+import com.sein.workshop.dto.UserDetailsDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,24 +11,24 @@ public final class SecurityUtils {
 
     private SecurityUtils() {}
 
-    public static CustomUserDetails getCurrentUser() {
+    public static UserDetailsDto getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !(auth.getPrincipal() instanceof CustomUserDetails)) {
+        if (auth == null || !(auth.getPrincipal() instanceof UserDetailsDto)) {
             return null;
         }
 
-        return (CustomUserDetails) auth.getPrincipal();
+        return (UserDetailsDto) auth.getPrincipal();
     }
 
-    public static List<String> getCurrentRoles() {
-        CustomUserDetails user = getCurrentUser();
-        if (user == null) return List.of();
-
-        return user.getRoles().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-    }
+//    public static List<String> getCurrentRoles() {
+//        CustomUserDetails user = getCurrentUser();
+//        if (user == null) return List.of();
+//
+//        return user.getRoles().stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .toList();
+//    }
 
     public static List<String> getCurrentPermissions() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

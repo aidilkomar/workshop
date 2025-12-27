@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +21,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -30,6 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private PermissionCache permissionCache;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
@@ -37,11 +42,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwt != null && jwtUtils.validateToken(jwt)) {
                 String username = jwtUtils.getUsernameFromJwt(jwt);
                 UUID uuid = jwtUtils.getUserUuid(jwt);
+                Long id = jwtUtils.getId(jwt);
 
-                Collection<? extends GrantedAuthority> authorities = jwtUtils.getAuthorities(jwt);
+//                Collection<? extends GrantedAuthority> authorities = jwtUtils.getAuthorities(jwt);
                 Collection<? extends GrantedAuthority> roles = jwtUtils.getRoles(jwt);
 
-                var userDetails = new UserDetailsDto(username, uuid, roles, authorities);
+                Set<String> allPermissions = roles.stream()
+                        .flatMap(role -> permissionCache.getPermission(role.toString()).stream())
+                        .collect(Collectors.toSet());
+
+                Collection<? extends GrantedAuthority> authorities = allPermissions.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList();
+
+                var userDetails = new UserDetailsDto(username, id, uuid, roles, authorities);
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(

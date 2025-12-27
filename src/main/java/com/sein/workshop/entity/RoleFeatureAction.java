@@ -5,19 +5,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "role_features")
-@Getter @Setter
-public class RoleFeature {
+@Table(name = "role_feature_actions")
+@Getter
+@Setter
+public class RoleFeatureAction {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private RoleFeatureActionId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("roleId")
     @JoinColumn(name = "role_id")
     private Role role;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("featureId")
     @JoinColumn(name = "feature_id")
     private Feature feature;
 }

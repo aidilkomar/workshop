@@ -1,12 +1,15 @@
 package com.sein.workshop.service;
 
 import com.sein.workshop.dto.user.UserCreateDto;
+import com.sein.workshop.dto.user.UserResponseDto;
 import com.sein.workshop.entity.User;
 import com.sein.workshop.handler.ConflictException;
 import com.sein.workshop.repository.UserRepository;
 import com.sein.workshop.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +38,24 @@ public class UserServiceImpl implements UserService {
         user.setUsername(req.username());
         user.setPassword(passwordEncoder.encode(req.password()));
         user.setEmail(req.email());
-        user.setCreatedBy(principal != null ? principal.getId().toString() : null);
+        user.setCreatedBy(principal != null ? principal.id().toString() : null);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public Page<UserResponseDto> getUsers(Pageable pageable, String search) {
+        Page<User> users;
+        if (search == null || search.isEmpty()) {
+            users = userRepository.findAll(pageable);
+        } else {
+            users = userRepository.findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(search, search, pageable);
+        }
+        return users.map(user -> new UserResponseDto(
+                user.getUuid(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt()
+        ));
     }
 }

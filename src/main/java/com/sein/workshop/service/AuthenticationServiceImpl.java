@@ -24,8 +24,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public String login(LoginRequest req) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        req.getUsername(),
-                        req.getPassword()
+                        req.username(),
+                        req.password()
                 )
         );
 
@@ -39,9 +39,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         assert userDetails != null;
         return jwtUtils.generateToken(
                 userDetails.getUsername(),
+                userDetails.getId(),
                 userDetails.getUuid(),
-                userDetails.getRoles(),
-                userDetails.getAuthorities()
+                userDetails.getRoles()
+//                userDetails.getAuthorities()
         );
     }
 }
