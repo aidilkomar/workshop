@@ -1,9 +1,11 @@
 package com.sein.workshop.controller;
 
 import com.sein.workshop.dto.ApiResponse;
+import com.sein.workshop.dto.role.RoleResponseDto;
 import com.sein.workshop.dto.user.UserCreateDto;
 import com.sein.workshop.dto.user.UserListRequestDto;
 import com.sein.workshop.dto.user.UserResponseDto;
+import com.sein.workshop.dto.user.UserRolesUpdateDto;
 import com.sein.workshop.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,8 +28,11 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/")
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getUsers(@Valid @RequestBody UserListRequestDto req) {
-        Pageable pageable = PageRequest.of(req.pagedRequest().page(), req.pagedRequest().size(),
+    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAll(@RequestBody @Valid UserListRequestDto req) {
+        int page = Math.max(req.pagedRequest().page() - 1, 0);
+        Pageable pageable = PageRequest.of(
+                page,
+                req.pagedRequest().size(),
                 Sort.by(req.pagedRequest().sortDirection() != null ? req.pagedRequest().sortBy() : "username")
                         .ascending());
 
@@ -42,13 +49,41 @@ public class UserController {
         );
     }
 
+    @GetMapping("/{uuid}/roles")
+    public ResponseEntity<ApiResponse<List<RoleResponseDto>>> getUserRoles(@PathVariable UUID uuid) {
+        List<RoleResponseDto> roles = userService.getUserRolesByUserUuid(uuid);
+        return ResponseEntity.ok(
+                ApiResponse.success("success retrieve user roles", roles, LocalDateTime.now())
+        );
+    }
+
 
     @PostMapping("/create")
     @PreAuthorize("@authz.hasPermission('user_read')")
-    public ResponseEntity<ApiResponse> create(@RequestBody @Valid UserCreateDto req) throws Exception {
+    public ResponseEntity<ApiResponse> create(@RequestBody @Valid UserCreateDto req) {
         userService.create(req);
         return ResponseEntity.ok(
                 ApiResponse.success("user has created", null, null)
+        );
+    }
+
+    @PostMapping("/create/{uuid}")
+    @PreAuthorize("@authz.hasPermission('user_read')")
+    public ResponseEntity<ApiResponse> createWithRole(@RequestBody @Valid UserCreateDto req, @PathVariable(name = "uuid") UUID roleUuid) throws Exception {
+        userService.addUserWithRole(req, roleUuid);
+        return ResponseEntity.ok(
+                ApiResponse.success("user has created", null, null)
+        );
+    }
+
+    @PutMapping("/{uuid}/roles")
+    public ResponseEntity<ApiResponse> addUserRoles(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid UserRolesUpdateDto req
+    ) {
+        userService.addUserRoles(uuid, req.roleUuids());
+        return ResponseEntity.ok(
+                ApiResponse.success("user has updated", null, LocalDateTime.now())
         );
     }
 }

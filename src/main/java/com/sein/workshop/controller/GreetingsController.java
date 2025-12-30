@@ -8,22 +8,30 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Greetings")
+@RequestMapping("/greetings")
 public class GreetingsController {
 
     @GetMapping("/")
-    @PreAuthorize("@authz.hasPermission('user_read')")
+    @PreAuthorize("@authz.hasAnyPermission('USER_READ', 'ADMIN_READ')")
     public GreetingResponse greeting() {
         GreetingResponse greetingResponse = new GreetingResponse(
                 "Hello",
                 List.of("Java", "C#"),
-                new Person("Sein", 1, 100000000)
+                new Person("Sein", 1, 10000000)
         );
         return greetingResponse;
     }
 
-    record Person(String name, int age, double savings){
+    @GetMapping("/unauthorize")
+    @PreAuthorize("@authz.hasPermission('ADMIN_READ')")
+    public Error error() {
+        return new Error("This unauthorized test");
+    }
 
+    record Error(String message){
+    }
+
+    record Person(String name, int age, double savings){
     }
 
     record GreetingResponse(
@@ -31,6 +39,5 @@ public class GreetingsController {
             List<String> favProgrammingLanguages,
             Person person
     ) {
-        
     }
 }

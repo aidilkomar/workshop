@@ -47,8 +47,6 @@ public class Role {
     @Column(name = "deleted_by", length = 50)
     private String deletedBy;
 
-    @OneToMany(mappedBy = "role")
-
     @PrePersist
     protected void onCreate() {
         if (uuid == null) {

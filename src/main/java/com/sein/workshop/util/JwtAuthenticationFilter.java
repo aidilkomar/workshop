@@ -1,6 +1,7 @@
 package com.sein.workshop.util;
 
 import com.sein.workshop.dto.UserDetailsDto;
+import com.sein.workshop.repository.RoleFeatureRepository;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,12 +29,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtils jwtUtils;
-
     @Autowired
     private UserDetailsService userDetailsService;
-
     @Autowired
     private PermissionCache permissionCache;
+    @Autowired
+    private RoleFeatureRepository roleFeatureRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,11 +48,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //                Collection<? extends GrantedAuthority> authorities = jwtUtils.getAuthorities(jwt);
                 Collection<? extends GrantedAuthority> roles = jwtUtils.getRoles(jwt);
 
-                Set<String> allPermissions = roles.stream()
-                        .flatMap(role -> permissionCache.getPermission(role.toString()).stream())
-                        .collect(Collectors.toSet());
+                Set<String> permissions = permissionCache.getPermission(id.toString());
 
-                Collection<? extends GrantedAuthority> authorities = allPermissions.stream()
+
+                if (permissions.isEmpty()) {
+                    permissions = new HashSet<>(roleFeatureRepository.findPermissionByUserId(id));
+                    permissionCache.setPermission(id.toString(), permissions);
+                }
+
+                Collection<? extends GrantedAuthority> authorities = permissions.stream()
                         .map(SimpleGrantedAuthority::new)
                         .toList();
 

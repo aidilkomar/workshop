@@ -47,10 +47,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                         perms.stream().map(SimpleGrantedAuthority::new).toList()
                 );
 
-        roles.forEach(role -> {
-            Set<String> permissionsForRole = new HashSet<>(perms);
-            permissionCache.setPermission(role, permissionsForRole);
-        });
+        permissionCache.setPermission(
+                user.getId().toString(),
+                new HashSet<>(perms)
+        );
 
         return userDetails;
     }

@@ -27,7 +27,7 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse<String>> login(@Valid @RequestBody LoginRequest req) {
         var token = authenticationService.login(req);
         if (token.isEmpty()) {
-//            return new ResponseEntity<>(new ApiResponse<>(false, ))
+            return ResponseEntity.ok(new ApiResponse<>(false, "login failed", null, LocalDateTime.now()));
         }
         return ResponseEntity.ok(new ApiResponse<>(true, "login success", token, LocalDateTime.now()));
     }
