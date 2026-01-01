@@ -1,10 +1,7 @@
 package com.sein.workshop.controller;
 
 import com.sein.workshop.dto.ApiResponse;
-import com.sein.workshop.dto.role.RoleCreateDto;
-import com.sein.workshop.dto.role.RoleFeaturesUpdateDto;
-import com.sein.workshop.dto.role.RoleListRequestDto;
-import com.sein.workshop.dto.role.RoleResponseDto;
+import com.sein.workshop.dto.role.*;
 import com.sein.workshop.service.RoleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +45,15 @@ public class RoleController {
                         req.pagedRequest().page(),
                         req.pagedRequest().size()
                 )
+        );
+    }
+
+    @GetMapping("/{uuid}/features")
+    @PreAuthorize("@authz.hasPermission('ADMIN_READ')")
+    public ResponseEntity<ApiResponse<List<RoleFeatureResponseDto>>> getRoleFeatures(UUID uuid) {
+        List<RoleFeatureResponseDto> results = roleService.getRoleFeatures(uuid);
+        return ResponseEntity.ok(
+                ApiResponse.success("success retrieve role features", results, LocalDateTime.now())
         );
     }
 

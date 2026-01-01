@@ -1,5 +1,6 @@
 package com.sein.workshop.repository;
 
+import com.sein.workshop.dto.role.RoleFeatureResponseDto;
 import com.sein.workshop.entity.Role;
 import com.sein.workshop.entity.RoleFeature;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface RoleFeatureRepository extends JpaRepository<RoleFeature, Long> {
@@ -69,4 +71,20 @@ public interface RoleFeatureRepository extends JpaRepository<RoleFeature, Long> 
 
 
     List<RoleFeature> findByRole(Role role);
+
+    @Query(value = """
+            select
+                f.name,
+                rf.can_write as canWrite,
+                rf.can_read as canRead,
+                rf.can_update as canUpdate,
+                rf.can_delete as canDelete,
+                rf.can_approve as canApprove,
+                rf.can_export as canExport
+            from roles r
+            join role_features rf on rf.role_id = r.id
+            join features f on f.id = rf.feature_id
+            where r.uuid = :uuid
+            """, nativeQuery = true)
+    List<RoleFeatureResponseDto> findAllFeaturesByUuid(@Param("uuid") UUID uuid);
 }

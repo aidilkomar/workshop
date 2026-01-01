@@ -28,6 +28,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/")
+    @PreAuthorize("@authz.hasPermission('ROLE_READ')")
     public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAll(@RequestBody @Valid UserListRequestDto req) {
         int page = Math.max(req.pagedRequest().page() - 1, 0);
         Pageable pageable = PageRequest.of(
@@ -50,6 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/{uuid}/roles")
+    @PreAuthorize("@authz.hasPermission('ADMIN_READ')")
     public ResponseEntity<ApiResponse<List<RoleResponseDto>>> getUserRoles(@PathVariable UUID uuid) {
         List<RoleResponseDto> roles = userService.getUserRolesByUserUuid(uuid);
         return ResponseEntity.ok(
@@ -59,7 +61,7 @@ public class UserController {
 
 
     @PostMapping("/create")
-    @PreAuthorize("@authz.hasPermission('user_read')")
+    @PreAuthorize("@authz.hasPermission('ADMIN_CREATE')")
     public ResponseEntity<ApiResponse> create(@RequestBody @Valid UserCreateDto req) {
         userService.create(req);
         return ResponseEntity.ok(
@@ -68,7 +70,7 @@ public class UserController {
     }
 
     @PostMapping("/create/{uuid}")
-    @PreAuthorize("@authz.hasPermission('user_read')")
+    @PreAuthorize("@authz.hasPermission('ADMIN_CREATE')")
     public ResponseEntity<ApiResponse> createWithRole(@RequestBody @Valid UserCreateDto req, @PathVariable(name = "uuid") UUID roleUuid) throws Exception {
         userService.addUserWithRole(req, roleUuid);
         return ResponseEntity.ok(
@@ -77,6 +79,7 @@ public class UserController {
     }
 
     @PutMapping("/{uuid}/roles")
+    @PreAuthorize("@authz.hasPermission('ADMIN_CREATE')")
     public ResponseEntity<ApiResponse> addUserRoles(
             @PathVariable UUID uuid,
             @RequestBody @Valid UserRolesUpdateDto req

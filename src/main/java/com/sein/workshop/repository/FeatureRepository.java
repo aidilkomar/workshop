@@ -50,4 +50,6 @@ public interface FeatureRepository extends JpaRepository<Feature, Long> {
     List<Feature> findByUuidIn(List<UUID> list);
 
     Page<Feature> findAllByCodeContainingIgnoreCaseOrNameContainingIgnoreCase(String search, String search1, Pageable pageable);
+
+    Optional<Feature> findFeatureByRoleUuid(UUID uuid);
 }

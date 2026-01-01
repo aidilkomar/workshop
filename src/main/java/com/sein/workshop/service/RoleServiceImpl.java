@@ -2,6 +2,7 @@ package com.sein.workshop.service;
 
 import com.sein.workshop.dto.role.RoleCreateDto;
 import com.sein.workshop.dto.role.RoleFeaturePermissionDto;
+import com.sein.workshop.dto.role.RoleFeatureResponseDto;
 import com.sein.workshop.dto.role.RoleResponseDto;
 import com.sein.workshop.entity.Feature;
 import com.sein.workshop.entity.Role;
@@ -67,6 +68,12 @@ public class RoleServiceImpl implements RoleService {
                         role.getName()
                 )
         );
+    }
+
+    @Override
+    public List<RoleFeatureResponseDto> getRoleFeatures(UUID uuid) {
+        var roleFeatures = roleFeatureRepository.findAllFeaturesByUuid(uuid);
+        return List.of();
     }
 
     @Transactional
