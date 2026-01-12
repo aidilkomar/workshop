@@ -24,7 +24,7 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/")
-    @PreAuthorize("@authz.hasPermission('ADMIN_READ')")
+//    @PreAuthorize("@authz.hasPermission('ADMIN_READ')")
     public ResponseEntity<ApiResponse<List<RoleResponseDto>>> getAll(@RequestBody @Valid RoleListRequestDto req) {
         int page = Math.max(req.pagedRequest().page() - 1, 0);
         Pageable pageable = PageRequest.of(
@@ -49,8 +49,8 @@ public class RoleController {
     }
 
     @GetMapping("/{uuid}/features")
-    @PreAuthorize("@authz.hasPermission('ADMIN_READ')")
-    public ResponseEntity<ApiResponse<List<RoleFeatureResponseDto>>> getRoleFeatures(UUID uuid) {
+//    @PreAuthorize("@authz.hasPermission('ADMIN_READ')")
+    public ResponseEntity<ApiResponse<List<RoleFeatureResponseDto>>> getRoleFeatures(@PathVariable("uuid") UUID uuid) {
         List<RoleFeatureResponseDto> results = roleService.getRoleFeatures(uuid);
         return ResponseEntity.ok(
                 ApiResponse.success("success retrieve role features", results, LocalDateTime.now())

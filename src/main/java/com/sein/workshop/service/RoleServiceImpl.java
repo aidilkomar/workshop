@@ -73,6 +73,8 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<RoleFeatureResponseDto> getRoleFeatures(UUID uuid) {
         var roleFeatures = roleFeatureRepository.findAllFeaturesByUuid(uuid);
+        if (!roleFeatures.isEmpty())
+            return roleFeatures;
         return List.of();
     }
 
