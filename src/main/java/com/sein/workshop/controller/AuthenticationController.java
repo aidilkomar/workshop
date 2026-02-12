@@ -5,7 +5,6 @@ import com.sein.workshop.dto.auth.LoginRequest;
 import com.sein.workshop.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +19,11 @@ import java.time.LocalDateTime;
 @RequestMapping("api/authentication")
 public class AuthenticationController {
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
+
+    public AuthenticationController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<String>> login(@Valid @RequestBody LoginRequest req) {

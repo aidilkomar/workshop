@@ -7,7 +7,6 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 
 import javax.sql.DataSource;
 
@@ -40,13 +39,5 @@ public class DatabaseConfig {
                 .username(username)
                 .password(password)
                 .build();
-//        DataSource acctualDataSource = DataSourceBuilder.create()
-//                .driverClassName(driver)
-//                .url(url)
-//                .username(username)
-//                .password(password)
-//                .build();
-//
-//        return new LazyConnectionDataSourceProxy(acctualDataSource);
     }
 }

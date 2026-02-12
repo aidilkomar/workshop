@@ -21,15 +21,6 @@ public final class SecurityUtils {
         return (UserDetailsDto) auth.getPrincipal();
     }
 
-//    public static List<String> getCurrentRoles() {
-//        CustomUserDetails user = getCurrentUser();
-//        if (user == null) return List.of();
-//
-//        return user.getRoles().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .toList();
-//    }
-
     public static List<String> getCurrentPermissions() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

@@ -15,6 +15,7 @@ public class CustomUserDetails implements UserDetails {
     private final UUID uuid;
     private final String username;
     private final String password;
+    @Getter
     private final Collection<? extends GrantedAuthority> roles;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -32,10 +33,6 @@ public class CustomUserDetails implements UserDetails {
         this.password = password;
         this.roles = roles;
         this.authorities = authorities;
-    }
-
-    public Collection<? extends GrantedAuthority> getRoles() {
-        return roles;
     }
 
     @Override

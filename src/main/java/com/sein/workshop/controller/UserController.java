@@ -8,7 +8,6 @@ import com.sein.workshop.dto.user.UserResponseDto;
 import com.sein.workshop.dto.user.UserRolesUpdateDto;
 import com.sein.workshop.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +23,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/")
     @PreAuthorize("@authz.hasPermission('ROLE_READ')")
@@ -62,7 +65,7 @@ public class UserController {
 
     @PostMapping("/create")
     @PreAuthorize("@authz.hasPermission('ADMIN_CREATE')")
-    public ResponseEntity<ApiResponse> create(@RequestBody @Valid UserCreateDto req) {
+    public ResponseEntity<ApiResponse<UserCreateDto>> create(@RequestBody @Valid UserCreateDto req) {
         userService.create(req);
         return ResponseEntity.ok(
                 ApiResponse.success("user has created", null, null)
@@ -71,7 +74,7 @@ public class UserController {
 
     @PostMapping("/create/{uuid}")
     @PreAuthorize("@authz.hasPermission('ADMIN_CREATE')")
-    public ResponseEntity<ApiResponse> createWithRole(@RequestBody @Valid UserCreateDto req, @PathVariable(name = "uuid") UUID roleUuid) throws Exception {
+    public ResponseEntity<ApiResponse<UserCreateDto>> createWithRole(@RequestBody @Valid UserCreateDto req, @PathVariable(name = "uuid") UUID roleUuid) {
         userService.addUserWithRole(req, roleUuid);
         return ResponseEntity.ok(
                 ApiResponse.success("user has created", null, null)
@@ -80,7 +83,7 @@ public class UserController {
 
     @PutMapping("/{uuid}/roles")
     @PreAuthorize("@authz.hasPermission('ADMIN_CREATE')")
-    public ResponseEntity<ApiResponse> addUserRoles(
+    public ResponseEntity<ApiResponse<UserRolesUpdateDto>> addUserRoles(
             @PathVariable UUID uuid,
             @RequestBody @Valid UserRolesUpdateDto req
     ) {

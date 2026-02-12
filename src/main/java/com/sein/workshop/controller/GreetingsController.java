@@ -14,12 +14,11 @@ public class GreetingsController {
     @GetMapping("/")
     @PreAuthorize("@authz.hasAnyPermission('USER_READ', 'ADMIN_READ')")
     public GreetingResponse greeting() {
-        GreetingResponse greetingResponse = new GreetingResponse(
+        return new GreetingResponse(
                 "Hello",
                 List.of("Java", "C#"),
                 new Person("Sein", 1, 10000000)
         );
-        return greetingResponse;
     }
 
     @GetMapping("/unauthorize")

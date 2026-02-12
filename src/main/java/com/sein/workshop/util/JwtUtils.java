@@ -59,7 +59,7 @@ public class JwtUtils {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException ex) {
+        } catch (JwtException | IllegalArgumentException _) {
             return false;
         }
     }
@@ -95,7 +95,7 @@ public class JwtUtils {
         return UUID.fromString(uid);
     }
 
-    public Collection<? extends GrantedAuthority> getRoles(String token) {
+    public List<SimpleGrantedAuthority> getRoles(String token) {
         @SuppressWarnings("unchecked")
         List<String> roles = Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -104,12 +104,12 @@ public class JwtUtils {
                 .getPayload()
                 .get("roles", List.class);
 
-        return roles.stream()
+        return roles == null ? List.of() : roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
     }
 
-    public Collection<? extends GrantedAuthority> getAuthorities(String token) {
+    public List<SimpleGrantedAuthority> getAuthorities(String token) {
         @SuppressWarnings("unchecked")
         List<String> perms = Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -118,7 +118,7 @@ public class JwtUtils {
                 .getPayload()
                 .get("perms", List.class);
 
-        return perms.stream()
+        return perms == null ? List.of() : perms.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
     }

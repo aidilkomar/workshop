@@ -4,7 +4,6 @@ import com.sein.workshop.dto.ApiResponse;
 import com.sein.workshop.dto.role.*;
 import com.sein.workshop.service.RoleService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +19,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/roles")
 public class RoleController {
-    @Autowired
-    private RoleService roleService;
+
+    private final RoleService roleService;
+
+    public RoleController(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @PostMapping("/")
 //    @PreAuthorize("@authz.hasPermission('ADMIN_READ')")
@@ -59,7 +62,7 @@ public class RoleController {
 
     @PostMapping("/create")
     @PreAuthorize("@authz.hasPermission('ADMIN_CREATE')")
-    public ResponseEntity<ApiResponse> create(@RequestBody @Valid RoleCreateDto req) throws Exception {
+    public ResponseEntity<ApiResponse<RoleCreateDto>> create(@RequestBody @Valid RoleCreateDto req) {
         roleService.create(req);
         return ResponseEntity.ok(
                 ApiResponse.success("role has created", req, LocalDateTime.now())
@@ -68,7 +71,7 @@ public class RoleController {
 
     @PutMapping("/{uuid}/features")
     @PreAuthorize("@authz.hasPermission('ADMIN_UPDATE')")
-    public ResponseEntity<ApiResponse> upsertRoleFeatures(
+    public ResponseEntity<ApiResponse<RoleFeaturesUpdateDto>> upsertRoleFeatures(
             @PathVariable UUID uuid,
             @RequestBody @Valid RoleFeaturesUpdateDto req
     ) {

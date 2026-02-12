@@ -7,7 +7,6 @@ import com.sein.workshop.dto.feature.FeatureListRequestDto;
 import com.sein.workshop.dto.feature.FeatureResponseDto;
 import com.sein.workshop.service.FeatureService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +21,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/features")
 public class FeatureController {
-    @Autowired
-    private FeatureService featureService;
+
+    private final FeatureService featureService;
+
+    public FeatureController(FeatureService featureService) {
+        this.featureService = featureService;
+    }
 
     @GetMapping("/nav")
     public ResponseEntity<ApiResponse<List<NavigationResponseDto>>> getNavigation() {
@@ -64,7 +67,7 @@ public class FeatureController {
 
     @PostMapping("/create")
     @PreAuthorize("@authz.hasPermission('ADMIN_CREATE')")
-    public ResponseEntity<ApiResponse> create(@RequestBody @Valid FeatureCreateDto req) throws Exception {
+    public ResponseEntity<ApiResponse<FeatureCreateDto>> create(@RequestBody @Valid FeatureCreateDto req) {
         featureService.create(req);
         return ResponseEntity.ok(
                 ApiResponse.success("feature has created", req, LocalDateTime.now())

@@ -1,5 +1,6 @@
 package com.sein.workshop.util;
 
+import com.sein.workshop.handler.MissingAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,9 @@ public class AuthorizationService {
 
     private Set<String> getAuthorities() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            throw new MissingAuthenticationException("No authentication found in Security Context");
+        }
         return auth.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)

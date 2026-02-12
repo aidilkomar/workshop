@@ -1,11 +1,9 @@
 package com.sein.workshop.service;
 
-import com.sein.workshop.dto.ApiResponse;
 import com.sein.workshop.dto.role.RoleResponseDto;
 import com.sein.workshop.dto.user.UserCreateDto;
 import com.sein.workshop.dto.user.UserResponseDto;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
